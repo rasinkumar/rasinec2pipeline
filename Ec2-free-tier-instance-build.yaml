@@ -1,0 +1,93 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Template to Create an EC2 instance in a VPC",
+    "Parameters": {
+        "ImageId": {
+            "Type": "String",
+            "Description": "Linux 2 AMI for us-east1 Region",
+            "Default": "ami-0aa7d40eeae50c9a9"
+        },
+        "VpcId": {
+            "Type": "String",
+            "Description": "VPC id",
+            "Default": "vpc-06c95a5134d4182f1"
+        },
+        "SubnetId": {
+            "Type": "String",
+            "Description": "Subnet in which to launch an EC2",
+            "Default": "subnet-0562bac85e24931b3"
+        },
+		"SecurityGroup1": {
+			"Default":"sg-0de642544e9737940",
+			"Description" : "Security Group 1 for  EC2 Instances",
+			"Type": "AWS::EC2::SecurityGroup::Id",
+			"AllowedPattern": "sg-[0-9a-z]{17}"
+		},
+		"SecurityGroup2": {
+			"Default":"sg-0c2fd6d790e83963f",
+			"Description" : "Security Group 2 for  EC2 Instances",
+			"Type": "AWS::EC2::SecurityGroup::Id",
+			"AllowedPattern": "sg-[0-9a-z]{17}"
+		},
+        "AvailabilityZone": {
+            "Type": "String",
+            "Description": "Availability Zone into which instance will launch",
+            "Default": "us-east-1a"
+        },
+        "InstanceType": {
+            "Type": "String",
+            "Description": "Choosing  t2 micro because it is free",
+            "Default": "t2.micro"
+        },
+        "KeyName": {
+            "Description": "SSH Keypair to login to the instance",
+            "Type": "AWS::EC2::KeyPair::KeyName",
+            "Default": "elbprivate"
+        }
+    },
+    "Resources": {
+        "DemoInstance": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "ImageId": {
+                    "Ref": "ImageId"
+                },
+                "InstanceType": {
+                    "Ref": "InstanceType"
+                },
+                "AvailabilityZone": {
+                    "Ref": "AvailabilityZone"
+                },
+                "KeyName": {
+                    "Ref": "KeyName"
+                },
+                "NetworkInterfaces": [
+                    {
+                        "DeviceIndex": 0,
+                        "AssociatePublicIpAddress": true,
+                        "DeleteOnTermination": true,
+                        "SubnetId": {
+                            "Ref": "SubnetId"
+                        },
+                        "GroupSet": [
+							{
+								"Ref": "SecurityGroup1"
+							},
+							{
+								"Ref": "SecurityGroup2"
+							}
+						]
+					}
+					]
+                    }
+            }
+        },
+    "Outputs": {
+        "DemoInstanceId": {
+            "Description": "Instance Id",
+            "Value": {
+                "Ref": "DemoInstance"
+            }
+        }
+    }
+}
